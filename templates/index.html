@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>💜 Ruta Óptima - TSP</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <style>
+    body {
+      background: linear-gradient(to right, #845EC2, #D65DB1);
+      font-family: 'Poppins', sans-serif;
+      color: white;
+    }
+    .container {
+      max-width: 700px;
+    }
+    h1 {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-section {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(132, 94, 194, 0.3);
+      color: black;
+    }
+    .btn-primary {
+      background-color: #845EC2;
+      border: none;
+    }
+    .btn-danger {
+      background-color: #D65DB1;
+      border: none;
+    }
+    #resultado {
+      display: none;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(132, 94, 194, 0.3);
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>💜 Ruta Óptima - TSP</h1>
+
+    <div class="form-section">
+      <form id="rutaForm">
+        <label class="form-label">📍 Ciudad Origen</label>
+        <select class="form-control mb-3" id="ciudadOrigen"></select>
+
+        <label class="form-label">🎯 Ciudad Destino</label>
+        <select class="form-control mb-3" id="ciudadDestino"></select>
+
+        <label class="form-label">🌡️ Temperatura Inicial</label>
+        <input type="number" step="0.1" class="form-control mb-3" id="tempInicial" placeholder="Ejemplo: 20">
+
+        <label class="form-label">❄️ Temperatura Mínima</label>
+        <input type="number" step="0.1" class="form-control mb-3" id="tempMinima" placeholder="Ejemplo: 0">
+
+        <label class="form-label">⚡ Velocidad de Enfriamiento</label>
+        <input type="number" step="0.001" class="form-control mb-3" id="velocidadEnfriamiento" placeholder="Ejemplo: 0.005">
+
+        <button type="button" class="btn btn-primary w-100 mt-3" onclick="calcularRuta()">🚀 Calcular Ruta</button>
+        <button type="button" class="btn btn-danger w-100 mt-2" onclick="limpiarCampos()">🧹 Limpiar</button>
+      </form>
+    </div>
+
+    <div id="resultado" class="mt-4"></div>
+  </div>
+
+  <script>
+    const ciudades = ["Jiloyork", "Toluca", "Atlacomulco", "Guadalajara", "Monterrey", "Quintana Roo", "Michoacán", "Aguascalientes", "CDMX", "QRO"];
+    const selectOrigen = document.getElementById("ciudadOrigen");
+    const selectDestino = document.getElementById("ciudadDestino");
+
+    ciudades.forEach(ciudad => {
+      selectOrigen.innerHTML += `<option>${ciudad}</option>`;
+      selectDestino.innerHTML += `<option>${ciudad}</option>`;
+    });
+
+    async function calcularRuta() {
+      const response = await axios.post("/ruta", {
+        origen: selectOrigen.value,
+        destino: selectDestino.value,
+        temperatura_inicial: parseFloat(document.getElementById("tempInicial").value),
+        temperatura_min: parseFloat(document.getElementById("tempMinima").value),
+        velocidad_enfriamiento: parseFloat(document.getElementById("velocidadEnfriamiento").value)
+      });
+
+      const data = response.data;
+      document.getElementById("resultado").innerHTML = `
+        <h2>📜 Resultado:</h2>
+        <p><strong>Ruta Óptima:</strong> ${data.ruta.join(" → ")}</p>
+        <p><strong>Distancia Total:</strong> ${data.distancia_total.toFixed(2)} km</p>
+      `;
+      document.getElementById("resultado").style.display = "block";
+    }
+  </script>
+</body>
+</html>
